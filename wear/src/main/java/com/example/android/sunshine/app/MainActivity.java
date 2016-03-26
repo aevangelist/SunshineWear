@@ -51,12 +51,14 @@ public class MainActivity extends Activity {
 
             Toast.makeText(context, "Intent Detected.", Toast.LENGTH_LONG).show();
 
-            String message = intent.getStringExtra(MIN_TEMP);
-            Log.i("MainActivity", "Broadcast received on watch: " + message);
+            String minTemp = intent.getStringExtra(MIN_TEMP);
+            String maxTemp = intent.getStringExtra(MAX_TEMP);
 
-            Bundle data = intent.getBundleExtra(MIN_TEMP);
+            Log.i("MainActivity", "Broadcast received on watch: " + minTemp + " " + maxTemp);
 
-            minTempTextView.setText(message);
+            //Bundle data = intent.getBundleExtra(MIN_TEMP);
+
+            //minTempTextView.setText(minTemp);
 
             // Display received data in UI
             /*String display = "Received from the data Layer\n" +

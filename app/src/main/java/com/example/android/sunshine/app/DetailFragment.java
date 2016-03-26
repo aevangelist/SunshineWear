@@ -50,7 +50,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
      * Fragment Listener
      */
     public interface DetailFragEventListener {
-        public void detailFragEvent(String minTemp, String maxTemp, int icon);
+        void detailFragEvent(String minTemp, String maxTemp, int icon);
     }
 
     private DetailFragEventListener eventListener;

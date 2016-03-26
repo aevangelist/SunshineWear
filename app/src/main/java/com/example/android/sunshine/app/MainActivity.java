@@ -43,6 +43,7 @@ import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
 
 public class MainActivity extends AppCompatActivity implements
+        DetailFragment.DetailFragEventListener,
         ForecastFragment.Callback,
         GoogleApiClient.ConnectionCallbacks,
         GoogleApiClient.OnConnectionFailedListener{
@@ -61,6 +62,11 @@ public class MainActivity extends AppCompatActivity implements
 
     //Google API Client
     GoogleApiClient googleAPIClient;
+
+    //Data to be sent to mobile
+    private String min;
+    private String max;
+    private int weatherIcon;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -229,10 +235,12 @@ public class MainActivity extends AppCompatActivity implements
 
     @Override
     public void onConnected(Bundle bundle) {
+        //Grab values to transfer
+
         // Create a DataMap object and send it to the data layer
         DataMap dataMap = new DataMap();
-        dataMap.putString(MIN_TEMP, "260");
-        dataMap.putString(MAX_TEMP, "270");
+        dataMap.putString(MIN_TEMP, min);
+        dataMap.putString(MAX_TEMP, max);
         dataMap.putLong("Time", System.currentTimeMillis()); //To ensure new data every time!
 
         Log.d(LOG_TAG, "DataMap object has been sent!");
@@ -258,6 +266,21 @@ public class MainActivity extends AppCompatActivity implements
     @Override
     public void onConnectionFailed(ConnectionResult connectionResult) {
 
+    }
+
+    /**
+     * Obtaining information from the fragment
+     * @param minTemp
+     * @param maxTemp
+     * @param icon
+     */
+    @Override
+    public void detailFragEvent(String minTemp, String maxTemp, int icon) {
+        min = minTemp;
+        max = maxTemp;
+        weatherIcon = icon;
+
+        Log.i("Interface", "Got info from detail fragment");
     }
 
     /**

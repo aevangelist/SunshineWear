@@ -19,6 +19,9 @@ public class MainActivity extends Activity {
     private static final String MAX_TEMP = "max";
 
     private TextView mTextView;
+    private TextView minTempTextView;
+    private TextView maxTempTextView;
+
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -52,6 +55,8 @@ public class MainActivity extends Activity {
             Log.i("MainActivity", "Broadcast received on watch: " + message);
 
             Bundle data = intent.getBundleExtra(MIN_TEMP);
+
+            minTempTextView.setText(message);
 
             // Display received data in UI
             /*String display = "Received from the data Layer\n" +

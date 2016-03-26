@@ -3,7 +3,6 @@ package com.example.android.sunshine.app;
 import android.content.Intent;
 import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
-import android.widget.Toast;
 
 import com.google.android.gms.wearable.DataEvent;
 import com.google.android.gms.wearable.DataEventBuffer;
@@ -46,17 +45,15 @@ public class ListenerService extends WearableListenerService {
 
     @Override
     public void onPeerConnected(Node peer) {
-        Toast.makeText(this, "Peer connected", Toast.LENGTH_LONG).show();
+        //Toast.makeText(this, "Peer connected", Toast.LENGTH_LONG).show();
     }
 
     @Override
     public void onDataChanged(DataEventBuffer dataEvents){
 
-        Toast.makeText(this, "SUP GURRL.", Toast.LENGTH_LONG).show();
-
+        //Toast.makeText(this, "SUP GURRL.", Toast.LENGTH_LONG).show();
 
         Log.i(LOG_TAG, "You made it");
-
 
         DataMap dataMap;
 

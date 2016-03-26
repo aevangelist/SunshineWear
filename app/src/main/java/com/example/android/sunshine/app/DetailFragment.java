@@ -15,6 +15,7 @@
  */
 package com.example.android.sunshine.app;
 
+import android.content.Context;
 import android.content.Intent;
 import android.database.Cursor;
 import android.net.Uri;
@@ -25,7 +26,6 @@ import android.support.v4.content.CursorLoader;
 import android.support.v4.content.Loader;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.CardView;
-import android.support.v7.widget.ShareActionProvider;
 import android.support.v7.widget.Toolbar;
 import android.view.LayoutInflater;
 import android.view.Menu;
@@ -46,11 +46,21 @@ import com.example.android.sunshine.app.data.WeatherContract.WeatherEntry;
  */
 public class DetailFragment extends Fragment implements LoaderManager.LoaderCallbacks<Cursor> {
 
+    /**
+     * Fragment Listener
+     */
+    public interface DetailFragEventListener {
+        public void detailFragEvent(String minTemp, String maxTemp, int icon);
+    }
+
+    private DetailFragEventListener eventListener;
+
     private static final String LOG_TAG = DetailFragment.class.getSimpleName();
     static final String DETAIL_URI = "URI";
     static final String DETAIL_TRANSITION_ANIMATION = "DTA";
 
     private static final String FORECAST_SHARE_HASHTAG = " #SunshineApp";
+
 
     private String mForecast;
     private Uri mUri;
@@ -134,6 +144,28 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
         menuItem.setIntent(createShareForecastIntent());
     }
 
+    /**
+     *
+     * @param minTemp
+     * @param maxTemp
+     * @param icon
+     */
+    private void sendToActivity(String minTemp, String maxTemp, int icon){
+        eventListener.detailFragEvent(minTemp, maxTemp, icon);
+
+    }
+
+    @Override
+    public void onAttach(Context context) {
+        super.onAttach(context);
+
+        try {
+            eventListener = (DetailFragEventListener) context;
+        } catch (ClassCastException e) {
+            throw new ClassCastException(context.toString() + " must implement DetailFragEventListener");
+        }
+    }
+
     @Override
     public void onCreateOptionsMenu(Menu menu, MenuInflater inflater) {
         if ( getActivity() instanceof DetailActivity ){
@@ -191,6 +223,9 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
 
     @Override
     public void onLoadFinished(Loader<Cursor> loader, Cursor data) {
+
+        int weatherIcon = 0; //Initialize - no image
+
         if (data != null && data.moveToFirst()) {
             ViewParent vp = getView().getParent();
             if ( vp instanceof CardView ) {
@@ -201,7 +236,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             int weatherId = data.getInt(COL_WEATHER_CONDITION_ID);
 
             if ( Utility.usingLocalGraphics(getActivity()) ) {
-                mIconView.setImageResource(Utility.getArtResourceForWeatherCondition(weatherId));
+                weatherIcon = Utility.getArtResourceForWeatherCondition(weatherId);
+                mIconView.setImageResource(weatherIcon);
             } else {
                 // Use weather art image
                 Glide.with(this)
@@ -263,7 +299,11 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             // We still need this for the share intent
             mForecast = String.format("%s - %s - %s/%s", dateText, description, high, low);
 
+            //Send to mobile wear
+            sendToActivity(lowString, highString, weatherIcon);
+
         }
+
         AppCompatActivity activity = (AppCompatActivity)getActivity();
         Toolbar toolbarView = (Toolbar) getView().findViewById(R.id.toolbar);
 

@@ -35,16 +35,32 @@ import com.example.android.sunshine.app.gcm.RegistrationIntentService;
 import com.example.android.sunshine.app.sync.SunshineSyncAdapter;
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GoogleApiAvailability;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.DataApi;
+import com.google.android.gms.wearable.DataMap;
+import com.google.android.gms.wearable.PutDataMapRequest;
+import com.google.android.gms.wearable.PutDataRequest;
+import com.google.android.gms.wearable.Wearable;
 
-public class MainActivity extends AppCompatActivity implements ForecastFragment.Callback {
+public class MainActivity extends AppCompatActivity implements
+        ForecastFragment.Callback,
+        GoogleApiClient.ConnectionCallbacks,
+        GoogleApiClient.OnConnectionFailedListener{
 
     private final String LOG_TAG = MainActivity.class.getSimpleName();
     private static final String DETAILFRAGMENT_TAG = "DFTAG";
     private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
     public static final String SENT_TOKEN_TO_SERVER = "sentTokenToServer";
 
+    private static final String WEARABLE_DATA_PATH = "/wearable_data";
+    private static final String MIN_TEMP = "min";
+    private static final String MAX_TEMP = "max";
+
     private boolean mTwoPane;
     private String mLocation;
+
+    //Google API Client
+    GoogleApiClient googleAPIClient;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -107,6 +123,13 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
                 startService(intent);
             }
         }
+
+        //Build your Google API Client
+        googleAPIClient = new GoogleApiClient.Builder(this)
+                .addApi(Wearable.API)
+                .addConnectionCallbacks(this)
+                .addOnConnectionFailedListener(this)
+                .build();
     }
 
     @Override
@@ -130,6 +153,13 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
         }
 
         return super.onOptionsItemSelected(item);
+    }
+
+    @Override
+    protected void onStart() {
+        super.onStart();
+        googleAPIClient.connect();
+        Log.d("", "Connected to Google API Client");
     }
 
     @Override
@@ -195,5 +225,68 @@ public class MainActivity extends AppCompatActivity implements ForecastFragment.
             return false;
         }
         return true;
+    }
+
+    @Override
+    public void onConnected(Bundle bundle) {
+        // Create a DataMap object and send it to the data layer
+        DataMap dataMap = new DataMap();
+        dataMap.putString(MIN_TEMP, "260");
+        dataMap.putString(MAX_TEMP, "270");
+        dataMap.putLong("Time", System.currentTimeMillis()); //To ensure new data every time!
+
+        Log.d(LOG_TAG, "DataMap object has been sent!");
+
+        //Requires a new thread to avoid blocking the UI
+        new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();
+    }
+
+    // Disconnect from the data layer when the Activity stops
+    @Override
+    protected void onStop() {
+        if (null != googleAPIClient && googleAPIClient.isConnected()) {
+            googleAPIClient.disconnect();
+        }
+        super.onStop();
+    }
+
+    @Override
+    public void onConnectionSuspended(int i) {
+
+    }
+
+    @Override
+    public void onConnectionFailed(ConnectionResult connectionResult) {
+
+    }
+
+    /**
+     * Inner class to send  data object to all nodes currently connected to the data layer
+     * Runs on a new thread
+     */
+    class SendToDataLayerThread extends Thread {
+        String path;
+        DataMap dataMap;
+
+        // Constructor for sending data objects to the data layer
+        SendToDataLayerThread(String p, DataMap data) {
+            path = p;
+            dataMap = data;
+        }
+
+        public void run() {
+            // Construct a DataRequest and send over the data layer
+            PutDataMapRequest putDMR = PutDataMapRequest.create(path);
+            putDMR.getDataMap().putAll(dataMap);
+            PutDataRequest request = putDMR.asPutDataRequest();
+            DataApi.DataItemResult result = Wearable.DataApi.putDataItem(googleAPIClient, request).await();
+            if (result.getStatus().isSuccess()) {
+                Log.v("myTag", "DataMap: " + dataMap + " sent successfully to data layer ");
+            }
+            else {
+                // Log an error
+                Log.v("myTag", "ERROR: failed to send DataMap to data layer");
+            }
+        }
     }
 }

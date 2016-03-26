@@ -54,12 +54,12 @@ public class MainActivity extends Activity {
             Bundle data = intent.getBundleExtra(MIN_TEMP);
 
             // Display received data in UI
-            String display = "Received from the data Layer\n" +
+            /*String display = "Received from the data Layer\n" +
                     "Hole: " + data.getString("hole") + "\n" +
                     "Front: " + data.getString("front") + "\n" +
                     "Middle: "+ data.getString("middle") + "\n" +
                     "Back: " + data.getString("back");
-            mTextView.setText(display);
+            mTextView.setText(display);*/
         }
     }
 

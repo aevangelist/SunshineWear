@@ -1,16 +1,65 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:orientation="vertical"
     tools:context="com.example.android.sunshine.app.MainActivity"
-    tools:deviceIds="wear_round">
+    tools:deviceIds="wear_round"
+    android:paddingTop="10dp"
+    android:paddingBottom="10dp"
+    android:background="@drawable/background">
 
-    <TextView
-        android:id="@+id/text"
-        android:layout_width="wrap_content"
+    <LinearLayout
+        android:orientation="vertical"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_centerHorizontal="true"
-        android:layout_centerVertical="true"
-        android:text="@string/hello_round" />
-</RelativeLayout>
+        android:gravity="center_horizontal">
+
+        <TextView
+            android:id="@+id/wearTime"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/test_time"
+            style="@style/TimeStyle"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/wearDate"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/test_date"
+            style="@style/DateStyle"
+            android:singleLine="true" />
+
+        <View style="@style/Divider"/>
+    </LinearLayout>
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:orientation="horizontal"
+        android:gravity="center_horizontal">
+
+        <ImageView
+            android:layout_width="50dp"
+            android:layout_height="50dp"
+            android:id="@+id/weatherIcon" />
+
+        <TextView
+            android:id="@+id/wearTempMin"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/test_temp1"
+            style="@style/TempStyle"
+            android:singleLine="true" />
+
+        <TextView
+            android:id="@+id/wearTempMax"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="@string/test_temp2"
+            style="@style/TempStyle"
+            android:singleLine="true" />
+    </LinearLayout>
+</LinearLayout>

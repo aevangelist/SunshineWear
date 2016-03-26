@@ -1,5 +1,12 @@
 <resources>
     <string name="app_name">SunshineWear</string>
+    <string name="my_analog_name">My Analog</string>
     <string name="hello_round">Hello Round World!</string>
     <string name="hello_square">Hello Square World!</string>
+
+    <!-- TEST STRINGS-->
+    <string name="test_time">15:50</string>
+    <string name="test_date">FRI, JUL 14 2015</string>
+    <string name="test_temp1">25</string>
+    <string name="test_temp2">16</string>
 </resources>

@@ -90,8 +90,6 @@ public class MainActivity extends Activity implements
                 mWearTime = (TextView) stub.findViewById(R.id.wearTime);
                 mWearDate = (TextView) stub.findViewById(R.id.wearDate);
 
-                mTimeInfoReceiver.onReceive(MainActivity.this, registerReceiver(null, INTENT_FILTER));    //  Here, we're just calling our onReceive() so it can set the current time.
-                registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
 
             }
         });
@@ -116,6 +114,9 @@ public class MainActivity extends Activity implements
         super.onStart();
         googleAPIClient.connect();
         Log.d("", "Connected to Google API Client");
+
+        mTimeInfoReceiver.onReceive(MainActivity.this, registerReceiver(null, INTENT_FILTER));    //  Here, we're just calling our onReceive() so it can set the current time.
+        registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
     }
 
 
@@ -134,34 +135,6 @@ public class MainActivity extends Activity implements
         unregisterReceiver(mTimeInfoReceiver);
     }
 
-    /**
-     *
-     * @param asset
-     * @return
-     */
-    public Bitmap loadBitmapFromAsset(Asset asset) {
-
-        if (asset == null) {
-            throw new IllegalArgumentException("Asset must be non-null");
-        }
-        ConnectionResult result =
-                googleAPIClient.blockingConnect(TIMEOUT_MS, TimeUnit.MILLISECONDS);
-        if (!result.isSuccess()) {
-            return null;
-        }
-        // convert asset into a file descriptor and block until it's ready
-        InputStream assetInputStream = Wearable.DataApi.getFdForAsset(
-                googleAPIClient, asset).await().getInputStream();
-        googleAPIClient.disconnect();
-
-        if (assetInputStream == null) {
-            Log.w(LOG_TAG, "Requested an unknown Asset.");
-            return null;
-        }
-        // decode the stream into a bitmap
-        return BitmapFactory.decodeStream(assetInputStream);
-    }
-
     @Override
     public void onConnected(Bundle bundle) {
 
@@ -178,8 +151,6 @@ public class MainActivity extends Activity implements
     }
 
     private void setTimeDate(){
-
-
 
         mWearTime.setText("");
         mWearDate.setText("");

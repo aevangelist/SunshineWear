@@ -90,6 +90,8 @@ public class MainActivity extends Activity implements
                 mWearTime = (TextView) stub.findViewById(R.id.wearTime);
                 mWearDate = (TextView) stub.findViewById(R.id.wearDate);
 
+                mTimeInfoReceiver.onReceive(MainActivity.this, registerReceiver(null, INTENT_FILTER));    //  Here, we're just calling our onReceive() so it can set the current time.
+                registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
 
             }
         });
@@ -114,9 +116,6 @@ public class MainActivity extends Activity implements
         super.onStart();
         googleAPIClient.connect();
         Log.d("", "Connected to Google API Client");
-
-        mTimeInfoReceiver.onReceive(MainActivity.this, registerReceiver(null, INTENT_FILTER));    //  Here, we're just calling our onReceive() so it can set the current time.
-        registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
     }
 
 

@@ -15,17 +15,22 @@
  */
 package com.example.android.sunshine.app;
 
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.util.Log;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.DataApi;
 import com.google.android.gms.wearable.DataMap;
 import com.google.android.gms.wearable.PutDataMapRequest;
 import com.google.android.gms.wearable.PutDataRequest;
 import com.google.android.gms.wearable.Wearable;
+
+import java.io.ByteArrayOutputStream;
 
 
 public class DetailActivity extends AppCompatActivity implements
@@ -38,10 +43,11 @@ public class DetailActivity extends AppCompatActivity implements
 
     private final String LOG_TAG = DetailActivity.class.getSimpleName();
 
-
     private static final String WEARABLE_DATA_PATH = "/wearable_data";
     private static final String MIN_TEMP = "min";
     private static final String MAX_TEMP = "max";
+    private static final String WEATHER_ICON = "icon";
+
 
     //Data to be sent to mobile
     private String min;
@@ -87,17 +93,34 @@ public class DetailActivity extends AppCompatActivity implements
         Log.d("", "Connected to Google API Client");
     }
 
+
+    /**
+     * Bitmap transformer
+     * @param bitmap
+     * @return
+     */
+    private static Asset createAssetFromBitmap(Bitmap bitmap) {
+        final ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
+        bitmap.compress(Bitmap.CompressFormat.PNG, 100, byteStream);
+        return Asset.createFromBytes(byteStream.toByteArray());
+    }
+
     @Override
     public void onConnected(Bundle bundle) {
-        //Grab values to transfer
+
+        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), weatherIcon);
+        Asset asset = createAssetFromBitmap(bitmap);
 
         // Create a DataMap object and send it to the data layer
         DataMap dataMap = new DataMap();
         dataMap.putString(MIN_TEMP, min);
         dataMap.putString(MAX_TEMP, max);
+        dataMap.putAsset(WEATHER_ICON, asset);
+        dataMap.putString("TEST", "test1");
         dataMap.putLong("Time", System.currentTimeMillis()); //To ensure new data every time!
 
-        Log.d(LOG_TAG, "DataMap object has been sent!");
+
+        Log.d(LOG_TAG, "DataMap object has been built.");
 
         //Requires a new thread to avoid blocking the UI
         new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();

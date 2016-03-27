@@ -49,7 +49,7 @@ public class ListenerService extends WearableListenerService {
 
     @Override
     public void onPeerConnected(Node peer) {
-        //Toast.makeText(this, "Peer connected", Toast.LENGTH_LONG).show();
+        Log.i(LOG_TAG, "##Peer connected ");
     }
 
 

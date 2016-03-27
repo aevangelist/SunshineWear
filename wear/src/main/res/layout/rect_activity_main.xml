@@ -40,19 +40,23 @@
         android:layout_width="match_parent"
         android:layout_height="match_parent"
         android:orientation="horizontal"
-        android:gravity="center_horizontal">
+        android:gravity="center_horizontal"
+        android:layout_marginLeft="15dp"
+        android:layout_marginRight="15dp">
 
         <ImageView
             android:layout_width="30dp"
             android:layout_height="30dp"
-            android:id="@+id/weatherIcon" />
+            android:id="@+id/weatherIcon"
+            android:layout_weight="1" />
 
         <TextView
             android:id="@+id/wearTempMin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/TempStyle"
-            android:singleLine="true"/>
+            android:singleLine="true"
+            android:layout_weight="1" />
             <!--android:text="@string/test_temp1"-->
 
 
@@ -61,7 +65,8 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             style="@style/TempStyle"
-            android:singleLine="true" />
+            android:singleLine="true"
+            android:layout_weight="1" />
         <!--android:text="@string/test_temp2"-->
 
 

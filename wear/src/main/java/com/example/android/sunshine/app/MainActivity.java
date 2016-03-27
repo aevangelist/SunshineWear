@@ -20,6 +20,8 @@ import com.google.android.gms.wearable.Asset;
 import com.google.android.gms.wearable.Wearable;
 
 import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.concurrent.TimeUnit;
 
 public class MainActivity extends Activity implements
@@ -42,9 +44,35 @@ public class MainActivity extends Activity implements
     private TextView mMaxTemp;
     private ImageView mWeatherIcon;
 
+    private TextView mWearTime;
+    private TextView mWearDate;
 
     //Google API Client
     GoogleApiClient googleAPIClient;
+
+    private final static IntentFilter INTENT_FILTER;
+    static {
+        INTENT_FILTER = new IntentFilter();
+        INTENT_FILTER.addAction(Intent.ACTION_TIME_TICK);
+        INTENT_FILTER.addAction(Intent.ACTION_TIMEZONE_CHANGED);
+        INTENT_FILTER.addAction(Intent.ACTION_TIME_CHANGED);
+    }
+
+    private final String TIME_FORMAT_DISPLAYED = "kk:mm";
+    private final String DATE_FORMAT_DISPLAYED = "EEE, MMM dd yyyy";
+
+
+    private BroadcastReceiver mTimeInfoReceiver = new BroadcastReceiver(){
+        @Override
+        public void onReceive(Context arg0, Intent intent) {
+            mWearTime.setText(
+                    new SimpleDateFormat(TIME_FORMAT_DISPLAYED)
+                            .format(Calendar.getInstance().getTime()));
+            mWearDate.setText(
+                    new SimpleDateFormat(DATE_FORMAT_DISPLAYED)
+                            .format(Calendar.getInstance().getTime()));
+        }
+    };
 
 
     @Override
@@ -58,6 +86,12 @@ public class MainActivity extends Activity implements
                 mMinTemp = (TextView) stub.findViewById(R.id.wearTempMin);
                 mMaxTemp = (TextView) stub.findViewById(R.id.wearTempMax);
                 mWeatherIcon = (ImageView) stub.findViewById(R.id.weatherIcon);
+
+                mWearTime = (TextView) stub.findViewById(R.id.wearTime);
+                mWearDate = (TextView) stub.findViewById(R.id.wearDate);
+
+                mTimeInfoReceiver.onReceive(MainActivity.this, registerReceiver(null, INTENT_FILTER));    //  Here, we're just calling our onReceive() so it can set the current time.
+                registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
 
             }
         });
@@ -92,6 +126,12 @@ public class MainActivity extends Activity implements
             googleAPIClient.disconnect();
         }
         super.onStop();
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        unregisterReceiver(mTimeInfoReceiver);
     }
 
     /**
@@ -137,6 +177,14 @@ public class MainActivity extends Activity implements
 
     }
 
+    private void setTimeDate(){
+
+
+
+        mWearTime.setText("");
+        mWearDate.setText("");
+    }
+
     public class MessageReceiver extends BroadcastReceiver {
 
         @Override
@@ -157,6 +205,8 @@ public class MainActivity extends Activity implements
             mMinTemp.setText(minTemp);
             mMaxTemp.setText(maxTemp);
             mWeatherIcon.setImageBitmap(bitmap);
+
+            setTimeDate();
 
         }
     }

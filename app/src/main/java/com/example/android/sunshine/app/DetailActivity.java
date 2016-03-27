@@ -116,7 +116,6 @@ public class DetailActivity extends AppCompatActivity implements
         dataMap.putString(MIN_TEMP, min);
         dataMap.putString(MAX_TEMP, max);
         dataMap.putAsset(WEATHER_ICON, asset);
-        dataMap.putString("TEST", "test1");
         dataMap.putLong("Time", System.currentTimeMillis()); //To ensure new data every time!
 
 

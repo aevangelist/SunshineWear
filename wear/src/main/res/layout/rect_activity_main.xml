@@ -20,17 +20,18 @@
             android:id="@+id/wearTime"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/test_time"
             style="@style/TimeStyle"
             android:singleLine="true" />
+        <!--android:text="@string/test_time"-->
 
         <TextView
             android:id="@+id/wearDate"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/test_date"
             style="@style/DateStyle"
             android:singleLine="true" />
+        <!--android:text="@string/test_date"-->
+
 
         <View style="@style/Divider"/>
     </LinearLayout>
@@ -50,16 +51,19 @@
             android:id="@+id/wearTempMin"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/test_temp1"
             style="@style/TempStyle"
-            android:singleLine="true" />
+            android:singleLine="true"/>
+            <!--android:text="@string/test_temp1"-->
+
 
         <TextView
             android:id="@+id/wearTempMax"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/test_temp2"
             style="@style/TempStyle"
             android:singleLine="true" />
+        <!--android:text="@string/test_temp2"-->
+
+
     </LinearLayout>
 </LinearLayout>

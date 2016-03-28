@@ -90,7 +90,8 @@ public class MainActivity extends Activity implements
                 mWearTime = (TextView) stub.findViewById(R.id.wearTime);
                 mWearDate = (TextView) stub.findViewById(R.id.wearDate);
 
-                mTimeInfoReceiver.onReceive(MainActivity.this, registerReceiver(null, INTENT_FILTER));    //  Here, we're just calling our onReceive() so it can set the current time.
+                mTimeInfoReceiver.onReceive(MainActivity.this, registerReceiver(null, INTENT_FILTER));
+                //  Here, we're just calling our onReceive() so it can set the current time.
                 registerReceiver(mTimeInfoReceiver, INTENT_FILTER);
 
             }
@@ -149,12 +150,6 @@ public class MainActivity extends Activity implements
 
     }
 
-    private void setTimeDate(){
-
-        mWearTime.setText("");
-        mWearDate.setText("");
-    }
-
     public class MessageReceiver extends BroadcastReceiver {
 
         @Override
@@ -175,8 +170,6 @@ public class MainActivity extends Activity implements
             mMinTemp.setText(minTemp);
             mMaxTemp.setText(maxTemp);
             mWeatherIcon.setImageBitmap(bitmap);
-
-            setTimeDate();
 
         }
     }

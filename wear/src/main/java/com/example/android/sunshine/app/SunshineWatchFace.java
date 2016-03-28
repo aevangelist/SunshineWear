@@ -22,6 +22,7 @@ import android.content.Intent;
 import android.content.IntentFilter;
 import android.content.res.Resources;
 import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
 import android.graphics.Paint;
@@ -37,7 +38,15 @@ import android.support.wearable.watchface.WatchFaceStyle;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.WindowInsets;
+import android.widget.ImageView;
+import android.widget.TextView;
 
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.api.GoogleApiClient;
+import com.google.android.gms.wearable.Asset;
+import com.google.android.gms.wearable.Wearable;
+
+import java.io.InputStream;
 import java.lang.ref.WeakReference;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
@@ -47,6 +56,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
     private static final String LOG_TAG = ".SunshineWatchFace";
 
+
     private static final Typeface NORMAL_TYPEFACE =
             Typeface.create(Typeface.SANS_SERIF, Typeface.NORMAL);
 
@@ -55,6 +65,21 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
     private final String TIME_FORMAT_DISPLAYED = "kk:mm";
     private final String DATE_FORMAT_DISPLAYED = "EEE, MMM dd yyyy";
+
+    private GoogleApiClient googleApiClient;
+    private static final long TIMEOUT_MS = (3 * 60000);
+
+    /** Variables from OPENWeatherAPI**/
+    private static final String WEARABLE_DATA_PATH = "/wearable_data";
+    private static final String MIN_TEMP = "min";
+    private static final String MAX_TEMP = "max";
+    private static final String WEATHER_ICON = "icon";
+
+    private Bitmap bitmap;
+
+    private TextView mMinTemp;
+    private TextView mMaxTemp;
+    private ImageView mWeatherIcon;
 
 
     @Override
@@ -84,9 +109,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
     }
 
     /**
-     * Engine of Canvas Watch Face Service
+     * ENGINE OF WATCH
      */
-    private class Engine extends CanvasWatchFaceService.Engine {
+    private class Engine extends CanvasWatchFaceService.Engine implements
+            GoogleApiClient.ConnectionCallbacks, GoogleApiClient.OnConnectionFailedListener{
         final Handler mUpdateTimeHandler = new EngineHandler(this);
         boolean mRegisteredTimeZoneReceiver = false;
 
@@ -136,6 +162,13 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                     .build());
             Resources resources = SunshineWatchFace.this.getResources();
 
+            //Set up Google API client
+            googleApiClient = new GoogleApiClient.Builder(SunshineWatchFace.this)
+                    .addApi(Wearable.API)
+                    .addConnectionCallbacks(this)
+                    .addOnConnectionFailedListener(this)
+                    .build();
+
             mYOffsetTime = resources.getDimension(R.dimen.digital_y_offset_time);
             mYOffsetDate = resources.getDimension(R.dimen.digital_y_offset_date);
 
@@ -175,14 +208,22 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             return paint;
         }
 
+        private void releaseGoogleApiClient() {
+            if (googleApiClient != null && googleApiClient.isConnected()) {
+                googleApiClient.disconnect();
+            }
+        }
+
         @Override
         public void onVisibilityChanged(boolean visible) {
             super.onVisibilityChanged(visible);
 
             if (visible) {
                 registerReceiver();
+                googleApiClient.connect();
             } else {
                 unregisterReceiver();
+                releaseGoogleApiClient();
             }
 
             // Whether the timer should be running depends on whether we're visible (as well as
@@ -327,5 +368,80 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             }
         }
 
+        @Override
+        public void onConnected(Bundle bundle) {
+            Log.d(LOG_TAG, "Connected to GoogleAPI");
+        }
+
+        @Override
+        public void onConnectionSuspended(int i) {
+            Log.d(LOG_TAG, "Suspended GoogleAPI");
+        }
+
+        @Override
+        public void onConnectionFailed(ConnectionResult connectionResult) {
+            Log.d(LOG_TAG, "Connection Failed to GoogleAPI");
+            super.onDestroy();
+        }
+    }
+
+    public class MessageReceiver extends BroadcastReceiver {
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+            //Toast.makeText(context, "Intent Detected.", Toast.LENGTH_LONG).show();
+
+            String minTemp = intent.getStringExtra(MIN_TEMP);
+            String maxTemp = intent.getStringExtra(MAX_TEMP);
+            Asset iconAsset = intent.getParcelableExtra(WEATHER_ICON);
+
+            //Requires a new thread to avoid blocking the UI
+            new LoadBitmapThread(iconAsset).start();
+
+            Log.i("MainActivity", "Broadcast received on watch: " + minTemp + " " + maxTemp + " " + bitmap);
+
+            //Display received data in UI
+            /*mMinTemp.setText(minTemp);
+            mMaxTemp.setText(maxTemp);
+            mWeatherIcon.setImageBitmap(bitmap);*/
+
+        }
+    }
+
+    /**
+     * Inner class to send  data object to all nodes currently connected to the data layer
+     * Runs on a new thread
+     */
+    class LoadBitmapThread extends Thread {
+        Asset asset;
+
+        // Constructor
+        LoadBitmapThread(Asset a) {
+            asset = a;
+        }
+
+        public void run() {
+            if (asset == null) {
+                throw new IllegalArgumentException("Asset must be non-null");
+            }
+
+            ConnectionResult result =
+                    googleApiClient.blockingConnect(TIMEOUT_MS, TimeUnit.MILLISECONDS);
+            if (!result.isSuccess()) {
+                Log.w(LOG_TAG, "Unable to connect to GoogleAPIClient");
+            }
+            // convert asset into a file descriptor and block until it's ready
+            InputStream assetInputStream = Wearable.DataApi.getFdForAsset(
+                    googleApiClient, asset).await().getInputStream();
+            googleApiClient.disconnect();
+
+            if (assetInputStream == null) {
+                Log.w(LOG_TAG, "Requested an unknown Asset.");
+            }
+            // decode the stream into a bitmap
+            Bitmap b =  BitmapFactory.decodeStream(assetInputStream);
+            bitmap = b;
+        }
     }
 }

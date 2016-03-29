@@ -56,7 +56,7 @@ public class ListenerService extends WearableListenerService {
     @Override
     public void onDataChanged(DataEventBuffer dataEvents){
 
-        Log.i(LOG_TAG, "The data to be sent has changed");
+        //Log.i(LOG_TAG, "The data to be sent has changed");
 
         DataMap dataMap;
 
@@ -81,9 +81,12 @@ public class ListenerService extends WearableListenerService {
                     dataIntent.putExtra(MIN_TEMP, minTemp);
                     dataIntent.putExtra(MAX_TEMP, maxTemp);
                     dataIntent.putExtra(WEATHER_ICON, iconAsset);
+
+                    //LocalBroadcastManager.getInstance().sendBroadcast(dataIntent);
                     LocalBroadcastManager.getInstance(this).sendBroadcast(dataIntent);
 
-                    Log.d(LOG_TAG, "DataMap received on watch: " + minTemp + " " + maxTemp);
+                    Log.d(LOG_TAG, "Broadcast INFO: " + dataIntent.getType() + " " + dataIntent.getAction());
+                    Log.d(LOG_TAG, "Broadcasting from listener: " + minTemp + " " + maxTemp + " " + iconAsset);
 
                 }
             }

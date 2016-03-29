@@ -110,6 +110,9 @@ public class MainActivity extends Activity implements
                 .addConnectionCallbacks(this)
                 .addOnConnectionFailedListener(this)
                 .build();
+
+        Intent i = new Intent(this, SunshineWatchFace.class);
+        startService(i);
     }
 
     @Override
@@ -164,7 +167,7 @@ public class MainActivity extends Activity implements
             //Requires a new thread to avoid blocking the UI
             new LoadBitmapThread(iconAsset).start();
 
-            Log.i("MainActivity", "Broadcast received on watch: " + minTemp + " " + maxTemp + " " + bitmap);
+            Log.i("MainActivity", "Broadcast received on MAIN: " + minTemp + " " + maxTemp + " " + bitmap);
 
             //Display received data in UI
             mMinTemp.setText(minTemp);

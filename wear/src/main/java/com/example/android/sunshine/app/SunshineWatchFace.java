@@ -25,6 +25,7 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Canvas;
 import android.graphics.Color;
+import android.graphics.Matrix;
 import android.graphics.Paint;
 import android.graphics.Rect;
 import android.graphics.Typeface;
@@ -62,7 +63,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
     private static final int MSG_UPDATE_TIME = 0;
 
     private final String TIME_FORMAT_DISPLAYED = "kk:mm";
-    private final String DATE_FORMAT_DISPLAYED = "EEE, MMM dd yyyy";
+    private final String DAY_FORMAT_DISPLAYED = "EEEE";
+    private final String DATE_FORMAT_DISPLAYED = "MMM dd yyyy";
 
     private GoogleApiClient googleApiClient;
     private static final long TIMEOUT_MS = (3 * 60000);
@@ -80,6 +82,7 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
     //Element values
     private String mTime;
     private String mDate;
+    private String mDay;
     private String mMinTemp;
     private String mMaxTemp;
     private Bitmap mBitmap;
@@ -126,10 +129,16 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         //Paint items
         Paint backgroundPaint;
         Paint timePaint;
+        Paint dayPaint;
         Paint datePaint;
         Paint minTempPaint;
         Paint maxTempPaint;
         Paint iconPaint;
+
+        //Dimension values;
+        float mXTime, mYTime, mXDay, mYDay, mXDate, mYDate, mXMax, mYMax, mXMin, mYMin, mXIcon, mYIcon;
+        //Size values;
+        float mTimeSize, mDaySize, mDateSize, mMaxSize, mMinSize, mIconSize;
 
         //Offset values
         float mXOffset;
@@ -147,6 +156,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
                 mTime = new SimpleDateFormat(TIME_FORMAT_DISPLAYED)
                         .format(Calendar.getInstance().getTime());
+
+                mDay = new SimpleDateFormat(DAY_FORMAT_DISPLAYED)
+                        .format(Calendar.getInstance().getTime());
+
                 mDate = new SimpleDateFormat(DATE_FORMAT_DISPLAYED)
                         .format(Calendar.getInstance().getTime());
 
@@ -229,7 +242,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             registerReceiver();
 
             setUpPaintItems(resources);
-            setUpOffset(resources);
 
             Log.d(LOG_TAG, "Created the watch face engine");
 
@@ -237,44 +249,58 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
 
         private void setUpPaintItems(Resources resources){
-            backgroundPaint = new Paint();
-            backgroundPaint.setColor(resources.getColor(R.color.background));
 
-            //Time
+            //Paint
             timePaint = new Paint();
-            timePaint = createTextPaint(resources.getColor(R.color.digital_text));
-
-            //Date
+            dayPaint = new Paint();
             datePaint = new Paint();
-            datePaint = createTextPaint(resources.getColor(R.color.digital_text));
-            float dateTextSize = resources.getDimension(R.dimen.digital_text_size_date);
-            datePaint.setTextSize(dateTextSize);
-
-            //Temperature
             minTempPaint = new Paint();
             maxTempPaint = new Paint();
-
-            //Icon
             iconPaint = new Paint();
 
+            //Sizes
+            mTimeSize = resources.getDimension(R.dimen.time_text_size);
+            mDaySize = resources.getDimension(R.dimen.day_text_size);
+            mDateSize = resources.getDimension(R.dimen.date_text_size);
+            mMaxSize = resources.getDimension(R.dimen.max_temp_text_size);
+            mMinSize = resources.getDimension(R.dimen.min_temp_text_size);
+            mIconSize = resources.getDimension(R.dimen.icon_size);
+
+            int white = resources.getColor(R.color.white);
+
+            //Configure Paint item size
+            timePaint.setTextSize(mTimeSize);
+            timePaint.setColor(white);
+            timePaint.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+            timePaint.setAntiAlias(true);
+
+            dayPaint.setTextSize(mDaySize);
+            dayPaint.setAntiAlias(true);
+            dayPaint.setColor(white);
+            dayPaint.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
+
+            datePaint.setTextSize(mDateSize);
+            datePaint.setAntiAlias(true);
+            datePaint.setColor(white);
+            datePaint.setTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));
+
+            maxTempPaint.setTextSize(mMaxSize);
+            maxTempPaint.setColor(white);
+            maxTempPaint.setAntiAlias(true);
+
+            minTempPaint.setTextSize(mMinSize);
+            minTempPaint.setColor(white);
+            minTempPaint.setTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));
+            minTempPaint.setAntiAlias(true);
+
             // Load the background image
+            backgroundPaint = new Paint();
+            backgroundPaint.setColor(resources.getColor(R.color.background));
             Drawable backgroundDrawable = resources.getDrawable(R.drawable.background, null);
             mBackgroundBitmap = ((BitmapDrawable) backgroundDrawable).getBitmap();
 
         }
 
-        private Paint createTextPaint(int textColor) {
-            Paint paint = new Paint();
-            paint.setColor(textColor);
-            paint.setTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));
-            paint.setAntiAlias(true);
-            return paint;
-        }
-
-        private void setUpOffset(Resources resources){
-            mYOffsetTime = resources.getDimension(R.dimen.digital_y_offset_time);
-            mYOffsetDate = resources.getDimension(R.dimen.digital_y_offset_date);
-        }
 
         @Override
         public void onDestroy() {
@@ -311,12 +337,10 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                 return;
             }
             mRegisteredTimeZoneReceiver = true;
-            //IntentFilter filter = new IntentFilter(Intent.ACTION_TIMEZONE_CHANGED);
-            //IntentFilter filter = new IntentFilter();
 
             IntentFilter filter = new IntentFilter(Intent.ACTION_SEND);
             LocalBroadcastManager.getInstance(SunshineWatchFace.this).registerReceiver(broadcastReceiver, filter);
-            //SunshineWatchFace.this.registerReceiver(broadcastReceiver, filter);
+
             Log.d(LOG_TAG, "Registered the broadcast receiver");
         }
 
@@ -326,7 +350,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             }
             mRegisteredTimeZoneReceiver = false;
             LocalBroadcastManager.getInstance(SunshineWatchFace.this).unregisterReceiver(broadcastReceiver);
-            //SunshineWatchFace.this.unregisterReceiver(broadcastReceiver);
         }
 
         @Override
@@ -335,13 +358,26 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
             // Load resources that have alternate values for round watches.
             Resources resources = SunshineWatchFace.this.getResources();
-            boolean isRound = insets.isRound();
+            /*boolean isRound = insets.isRound();
             mXOffset = resources.getDimension(isRound
                     ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
             float textSize = resources.getDimension(isRound
-                    ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);
+                    ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);*/
 
-            timePaint.setTextSize(textSize);
+            //Coordinates
+            mXTime = resources.getDimension(R.dimen.time_x);
+            mYTime = resources.getDimension(R.dimen.time_y);
+            mXDay = resources.getDimension(R.dimen.day_x);
+            mYDay = resources.getDimension(R.dimen.day_y);
+            mXDate = resources.getDimension(R.dimen.date_x);
+            mYDate = resources.getDimension(R.dimen.date_y);
+            mXIcon = resources.getDimension(R.dimen.icon_x);
+            mYIcon = resources.getDimension(R.dimen.icon_y);
+            mXMax = resources.getDimension(R.dimen.max_temp_x);
+            mYMax = resources.getDimension(R.dimen.max_temp_y);
+            mXMin = resources.getDimension(R.dimen.min_temp_x);
+            mYMin = resources.getDimension(R.dimen.min_temp_y);
+
         }
 
         @Override
@@ -399,14 +435,6 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
 
-            //Log.i(LOG_TAG, "##Drawing the following: " + sunshineObj.getMinTemp() + " "
-              //      + sunshineObj.getMaxTemp() + " " + sunshineObj.getIcon());
-
-
-            //Log.i(LOG_TAG, "onDraw is running");
-
-            //canvas.drawBitmap(mBackgroundBitmap, 0, 0, backgroundPaint);
-
             // Draw the background.
             if (isInAmbientMode()) {
                 canvas.drawColor(Color.WHITE);
@@ -415,41 +443,45 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                 canvas.drawBitmap(mBackgroundBitmap, 0, 0, backgroundPaint);
             }
 
-            //Grab values
-            /*mTime = new SimpleDateFormat(TIME_FORMAT_DISPLAYED)
-                    .format(Calendar.getInstance().getTime());
-            mDate = new SimpleDateFormat(DATE_FORMAT_DISPLAYED)
-                    .format(Calendar.getInstance().getTime());*/
-
             //Draw elements
             if(mTime != null){
-                canvas.drawText(mTime, mXOffset, mYOffsetTime, timePaint);
-                Log.i(LOG_TAG, "Drawing time " + mTime);
+                canvas.drawText(mTime, mXTime, mYTime, timePaint);
+            }
+
+            if(mDay != null){
+                canvas.drawText(mDay.toUpperCase(), mXDay, mYDay, dayPaint);
             }
 
             if(mDate != null){
-                canvas.drawText(mDate, mXOffset, mYOffsetDate, datePaint);
-                Log.i(LOG_TAG, "Drawing date " + mDate);
-
+                canvas.drawText(mDate, mXDate, mYDate, datePaint);
             }
 
             if(mMinTemp != null){
-                canvas.drawText(mMinTemp, mXOffset, mYOffsetDate, minTempPaint);
-                Log.i(LOG_TAG, "Drawing min temp " + mMinTemp);
-
+                canvas.drawText(mMinTemp, mXMin, mYMin, minTempPaint);
             }
 
             if(mMaxTemp != null){
-                canvas.drawText(mMaxTemp, mXOffset, mYOffsetDate, maxTempPaint);
-                Log.i(LOG_TAG, "Drawing max temp " + mMaxTemp);
-
+                canvas.drawText(mMaxTemp, mXMax, mYMax, maxTempPaint);
             }
 
             if(mBitmap != null){
-                canvas.drawBitmap(mBitmap, mXOffset, mYOffsetDate, iconPaint);
-                Log.i(LOG_TAG, "Drawing icon " + mBitmap);
-
+                //Resize Bitmap
+                int size = Math.round(mIconSize);
+                mBitmap= scaleBitmap(mBitmap, size, size);
+                canvas.drawBitmap(mBitmap, mXIcon, mYIcon, iconPaint);
             }
+        }
+
+
+        private Bitmap scaleBitmap(Bitmap bitmap, int wantedWidth, int wantedHeight) {
+
+            Bitmap output = Bitmap.createBitmap(wantedWidth, wantedHeight, Bitmap.Config.ARGB_8888);
+            Canvas canvas = new Canvas(output);
+            Matrix m = new Matrix();
+            m.setScale((float) wantedWidth / bitmap.getWidth(), (float) wantedHeight / bitmap.getHeight());
+            canvas.drawBitmap(bitmap, m, new Paint());
+
+            return output;
         }
 
         /**

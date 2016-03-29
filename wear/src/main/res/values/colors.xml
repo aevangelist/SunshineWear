@@ -3,4 +3,7 @@
     <color name="background">#009688</color>
     <color name="background2">#C2185B</color>
     <color name="digital_text">#ffffff</color>
+
+    <color name="white">#ffffff</color>
+
 </resources>

@@ -5,14 +5,37 @@
 
     <dimen name="digital_text_size_date">20dp</dimen>
 
-
     <dimen name="digital_x_offset">15dp</dimen>
     <dimen name="digital_x_offset_round">50dp</dimen>
-
     <dimen name="digital_y_offset_time">90dp</dimen>
-
     <dimen name="digital_x_offset_date">30dp</dimen>
     <dimen name="digital_y_offset_date">110dp</dimen>
 
+    <!--Size of elements-->
+    <dimen name="time_text_size">50sp</dimen>
+    <dimen name="day_text_size">15sp</dimen>
+    <dimen name="date_text_size">15sp</dimen>
+    <dimen name="max_temp_text_size">30sp</dimen>
+    <dimen name="min_temp_text_size">20sp</dimen>
+    <dimen name="icon_size">50dp</dimen>
+
+    <!--Coordinates of elements-->
+    <dimen name="time_x">45dp</dimen>
+    <dimen name="time_y">90dp</dimen>
+
+    <dimen name="day_x">80dp</dimen>
+    <dimen name="day_y">110dp</dimen>
+
+    <dimen name="date_x">70dp</dimen>
+    <dimen name="date_y">125dp</dimen>
+
+    <dimen name="max_temp_x">120dp</dimen>
+    <dimen name="max_temp_y">170dp</dimen>
+
+    <dimen name="min_temp_x">125dp</dimen>
+    <dimen name="min_temp_y">190dp</dimen>
+
+    <dimen name="icon_x">60dp</dimen>
+    <dimen name="icon_y">145dp</dimen>
 
 </resources>

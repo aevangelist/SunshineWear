@@ -50,7 +50,7 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
      * Fragment Listener
      */
     public interface DetailFragEventListener {
-        void detailFragEvent(String minTemp, String maxTemp, int icon);
+        void detailFragEvent(String minTemp, String maxTemp, int icon, boolean b);
     }
 
     private DetailFragEventListener eventListener;
@@ -150,8 +150,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
      * @param maxTemp
      * @param icon
      */
-    private void sendToActivity(String minTemp, String maxTemp, int icon){
-        eventListener.detailFragEvent(minTemp, maxTemp, icon);
+    private void sendToActivity(String minTemp, String maxTemp, int icon, boolean b){
+        eventListener.detailFragEvent(minTemp, maxTemp, icon, b);
 
     }
 
@@ -299,9 +299,10 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             // We still need this for the share intent
             mForecast = String.format("%s - %s - %s/%s", dateText, description, high, low);
 
-            //Send to mobile wear
-            sendToActivity(lowString, highString, weatherIcon);
-
+            //Send to mobile wear only if today's data
+            if(dateText.contains("Today")){
+                sendToActivity(lowString, highString, weatherIcon, true);
+            }
         }
 
         AppCompatActivity activity = (AppCompatActivity)getActivity();

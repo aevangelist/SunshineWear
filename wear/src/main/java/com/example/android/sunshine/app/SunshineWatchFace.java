@@ -440,7 +440,9 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                 canvas.drawColor(Color.WHITE);
             } else {
                 //canvas.drawRect(0, 0, bounds.width(), bounds.height(), backgroundPaint);
-                canvas.drawBitmap(mBackgroundBitmap, 0, 0, backgroundPaint);
+                mBackgroundBitmap = scaleBitmap(mBackgroundBitmap, 300, 300);
+                backgroundPaint.setAntiAlias(true);
+                canvas.drawBitmap(mBackgroundBitmap, 5, 5, backgroundPaint);
             }
 
             //Draw elements

@@ -48,8 +48,8 @@ public class DetailActivity extends AppCompatActivity implements
     private static final String MAX_TEMP = "max";
     private static final String WEATHER_ICON = "icon";
 
-
     //Data to be sent to mobile
+    private boolean isToday = false;
     private String min;
     private String max;
     private int weatherIcon;
@@ -108,21 +108,22 @@ public class DetailActivity extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle bundle) {
 
-        Bitmap bitmap = BitmapFactory.decodeResource(getResources(), weatherIcon);
-        Asset asset = createAssetFromBitmap(bitmap);
+        if (isToday){
+            Bitmap bitmap = BitmapFactory.decodeResource(getResources(), weatherIcon);
+            Asset asset = createAssetFromBitmap(bitmap);
 
-        // Create a DataMap object and send it to the data layer
-        DataMap dataMap = new DataMap();
-        dataMap.putString(MIN_TEMP, min);
-        dataMap.putString(MAX_TEMP, max);
-        dataMap.putAsset(WEATHER_ICON, asset);
-        dataMap.putLong("Time", System.currentTimeMillis()); //To ensure new data every time!
+            // Create a DataMap object and send it to the data layer
+            DataMap dataMap = new DataMap();
+            dataMap.putString(MIN_TEMP, min);
+            dataMap.putString(MAX_TEMP, max);
+            dataMap.putAsset(WEATHER_ICON, asset);
+            //dataMap.putLong("Time", System.currentTimeMillis()); //To ensure new data every time!
 
+            Log.d(LOG_TAG, "DataMap object has been built.");
 
-        Log.d(LOG_TAG, "DataMap object has been built.");
-
-        //Requires a new thread to avoid blocking the UI
-        new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();
+            //Requires a new thread to avoid blocking the UI
+            new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();
+        }
     }
 
     // Disconnect from the data layer when the Activity stops
@@ -148,10 +149,11 @@ public class DetailActivity extends AppCompatActivity implements
      * @param icon
      */
     @Override
-    public void detailFragEvent(String minTemp, String maxTemp, int icon) {
+    public void detailFragEvent(String minTemp, String maxTemp, int icon, boolean b) {
         min = minTemp;
         max = maxTemp;
         weatherIcon = icon;
+        isToday = b;
 
         Log.i("Interface", "Got info from detail fragment " + minTemp + " " + maxTemp);
     }

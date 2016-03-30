@@ -44,7 +44,7 @@
             android:permission="android.permission.BIND_WALLPAPER">
             <meta-data
                 android:name="com.google.android.clockwork.home.preview"
-                android:resource="@drawable/background"/>
+                android:resource="@drawable/square_preview"/>
             <meta-data
                 android:name="android.service.wallpaper"
                 android:resource="@xml/watch_face" />

@@ -116,13 +116,14 @@ public class DetailActivity extends AppCompatActivity implements
             dataMap.putString(MIN_TEMP, min);
             dataMap.putString(MAX_TEMP, max);
             dataMap.putAsset(WEATHER_ICON, asset);
-            //dataMap.putLong("Time", System.currentTimeMillis()); //To ensure new data every time!
+            dataMap.putLong("Time", System.currentTimeMillis()); //To ensure new data every time!
 
             Log.d(LOG_TAG, "DataMap object has been built.");
 
+        if(isToday){
             //Requires a new thread to avoid blocking the UI
             new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();
-
+        }
     }
 
     // Disconnect from the data layer when the Activity stops

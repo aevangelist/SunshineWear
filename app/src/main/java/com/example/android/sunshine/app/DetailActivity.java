@@ -108,7 +108,6 @@ public class DetailActivity extends AppCompatActivity implements
     @Override
     public void onConnected(Bundle bundle) {
 
-        if (isToday){
             Bitmap bitmap = BitmapFactory.decodeResource(getResources(), weatherIcon);
             Asset asset = createAssetFromBitmap(bitmap);
 
@@ -123,7 +122,7 @@ public class DetailActivity extends AppCompatActivity implements
 
             //Requires a new thread to avoid blocking the UI
             new SendToDataLayerThread(WEARABLE_DATA_PATH, dataMap).start();
-        }
+
     }
 
     // Disconnect from the data layer when the Activity stops

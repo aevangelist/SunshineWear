@@ -1,0 +1,21 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <!--Shifters-->
+    <integer name="square_shift_x">15</integer>
+    <integer name="square_shift_y">20</integer>
+
+    <!--Coordinates of elements-->
+    <integer name="time_x">45</integer>
+    <integer name="time_y">90</integer>
+    <integer name="day_x">80</integer>
+    <integer name="day_y">110</integer>
+    <integer name="date_x">70</integer>
+    <integer name="date_y">125</integer>
+    <integer name="max_temp_x">120</integer>
+    <integer name="max_temp_y">170</integer>
+    <integer name="min_temp_x">125</integer>
+    <integer name="min_temp_y">190</integer>
+    <integer name="icon_x">60</integer>
+    <integer name="icon_y">145</integer>
+
+</resources>

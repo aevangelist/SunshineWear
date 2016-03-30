@@ -20,6 +20,8 @@
     <dimen name="icon_size">50dp</dimen>
     <dimen name="background_size">250dp</dimen>
 
+    <!--Shifters-->
+    <dimen name="square_shift">15dp</dimen>
 
     <!--Coordinates of elements-->
     <dimen name="time_x">45dp</dimen>

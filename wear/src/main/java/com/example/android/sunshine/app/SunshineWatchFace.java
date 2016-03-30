@@ -289,8 +289,8 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
             maxTempPaint.setAntiAlias(true);
 
             minTempPaint.setTextSize(mMinSize);
-            minTempPaint.setColor(white);
-            minTempPaint.setTypeface(Typeface.create("sans-serif-thin", Typeface.NORMAL));
+            minTempPaint.setColor(Color.parseColor("#FFCA28"));
+            minTempPaint.setTypeface(Typeface.create("sans-serif-light", Typeface.NORMAL));
             minTempPaint.setAntiAlias(true);
 
             // Load the background image
@@ -358,25 +358,38 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
 
             // Load resources that have alternate values for round watches.
             Resources resources = SunshineWatchFace.this.getResources();
-            /*boolean isRound = insets.isRound();
-            mXOffset = resources.getDimension(isRound
-                    ? R.dimen.digital_x_offset_round : R.dimen.digital_x_offset);
-            float textSize = resources.getDimension(isRound
-                    ? R.dimen.digital_text_size_round : R.dimen.digital_text_size);*/
+            boolean isRound = insets.isRound();
 
-            //Coordinates
-            mXTime = resources.getDimension(R.dimen.time_x);
-            mYTime = resources.getDimension(R.dimen.time_y);
-            mXDay = resources.getDimension(R.dimen.day_x);
-            mYDay = resources.getDimension(R.dimen.day_y);
-            mXDate = resources.getDimension(R.dimen.date_x);
-            mYDate = resources.getDimension(R.dimen.date_y);
-            mXIcon = resources.getDimension(R.dimen.icon_x);
-            mYIcon = resources.getDimension(R.dimen.icon_y);
-            mXMax = resources.getDimension(R.dimen.max_temp_x);
-            mYMax = resources.getDimension(R.dimen.max_temp_y);
-            mXMin = resources.getDimension(R.dimen.min_temp_x);
-            mYMin = resources.getDimension(R.dimen.min_temp_y);
+            int shift_x = resources.getInteger(R.integer.square_shift_x);
+            int shift_y = resources.getInteger(R.integer.square_shift_y);
+
+            if(isRound){
+                mXTime = resources.getDimension(R.dimen.time_x);
+                mYTime = resources.getDimension(R.dimen.time_y);
+                mXDay = resources.getDimension(R.dimen.day_x);
+                mYDay = resources.getDimension(R.dimen.day_y);
+                mXDate = resources.getDimension(R.dimen.date_x);
+                mYDate = resources.getDimension(R.dimen.date_y);
+                mXIcon = resources.getDimension(R.dimen.icon_x);
+                mYIcon = resources.getDimension(R.dimen.icon_y);
+                mXMax = resources.getDimension(R.dimen.max_temp_x);
+                mYMax = resources.getDimension(R.dimen.max_temp_y);
+                mXMin = resources.getDimension(R.dimen.min_temp_x);
+                mYMin = resources.getDimension(R.dimen.min_temp_y);
+            }else{
+                mXTime = resources.getInteger(R.integer.time_x) + shift_x;
+                mYTime = resources.getInteger(R.integer.time_y) + shift_y;
+                mXDay = resources.getInteger(R.integer.day_x) + shift_x;
+                mYDay = resources.getInteger(R.integer.day_y) + shift_y + 10;
+                mXDate = resources.getInteger(R.integer.date_x) + shift_x;
+                mYDate = resources.getInteger(R.integer.date_y) + shift_y + 20;
+                mXIcon = resources.getInteger(R.integer.icon_x) + shift_x;
+                mYIcon = resources.getInteger(R.integer.icon_y) + shift_y + 30;
+                mXMax = resources.getInteger(R.integer.max_temp_x) + shift_x + 15;
+                mYMax = resources.getInteger(R.integer.max_temp_y) + shift_y + 40;
+                mXMin = resources.getInteger(R.integer.min_temp_x) + shift_x + 15;
+                mYMin = resources.getInteger(R.integer.min_temp_y) + shift_y + 50;
+            }
 
         }
 
@@ -435,6 +448,12 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
         @Override
         public void onDraw(Canvas canvas, Rect bounds) {
 
+            int height = canvas.getHeight();
+            int width = canvas.getWidth();
+
+            Log.d(LOG_TAG, "Height: " + height + " Width: " + width);
+
+
             // Draw the background.
             if (isInAmbientMode()) {
                 canvas.drawColor(Color.WHITE);
@@ -442,8 +461,15 @@ public class SunshineWatchFace extends CanvasWatchFaceService {
                 //canvas.drawRect(0, 0, bounds.width(), bounds.height(), backgroundPaint);
                 mBackgroundBitmap = scaleBitmap(mBackgroundBitmap, 320, 320);
                 backgroundPaint.setAntiAlias(true);
-                canvas.drawBitmap(mBackgroundBitmap, 5, 5, backgroundPaint);
+                backgroundPaint.setColor(Color.parseColor("#26A69A"));
+                canvas.drawRect(0, 0, width, height, backgroundPaint);
+                //canvas.drawBitmap(mBackgroundBitmap, 5, 5, backgroundPaint);
             }
+
+            //Draw rectangle
+            Paint myPaint = new Paint();
+            myPaint.setColor(Color.parseColor("#C2185B"));
+            canvas.drawRect(0, (height / 3) * 2, width, width, myPaint);
 
             //Draw elements
             if(mTime != null){

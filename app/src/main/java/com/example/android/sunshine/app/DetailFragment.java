@@ -300,9 +300,8 @@ public class DetailFragment extends Fragment implements LoaderManager.LoaderCall
             mForecast = String.format("%s - %s - %s/%s", dateText, description, high, low);
 
             //Send to mobile wear only if today's data
-            if(dateText.contains("Today")){
-                sendToActivity(lowString, highString, weatherIcon, true);
-            }
+            sendToActivity(lowString, highString, weatherIcon, true);
+
         }
 
         AppCompatActivity activity = (AppCompatActivity)getActivity();
